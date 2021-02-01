@@ -1,6 +1,6 @@
 {
 	"name": "key-value-exists",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "Returns existence of key or value in an object",
 	"license": "MIT",
 	"repository": "faizanu94/key-value-exists",
