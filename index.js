@@ -4,7 +4,7 @@ const isObject = value => typeof value === 'object' && value !== null;
 
 const traverse = function (object, target, options) {
 	for (const [key, value] of Object.entries(object)) {
-		if (key === target || JSON.stringify(value) === JSON.stringify(target)) {
+		if (key === target || (typeof value === 'object' ? JSON.stringify(value) === target : value === target)) {
 			options.exists = true;
 			return true;
 		}
@@ -23,5 +23,5 @@ module.exports = (object, target, options) => {
 	}
 
 	options = {deep: false, exists: false, ...options};
-	return traverse(object, target, options);
+	return traverse(object, typeof target === 'object' ? JSON.stringify(target) : target, options);
 };
