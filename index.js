@@ -1,20 +1,33 @@
 'use strict';
 
-const isObject = value => typeof value === 'object' && value !== null;
+const isObject = value => value !== null && typeof value === 'object';
 
-const traverse = function (object, target, options) {
+const traversePrimitive = function (object, target, options) {
 	for (const [key, value] of Object.entries(object)) {
-		if (key === target || (typeof value === 'object' ? JSON.stringify(value) === target : value === target)) {
-			options.exists = true;
+		if (key === target || value === target) {
 			return true;
 		}
 
 		if (options.deep && typeof value === 'object') {
-			traverse(value, target, options);
+			return traversePrimitive(value, target, options);
 		}
 	}
 
-	return options.exists;
+	return false;
+};
+
+const traverseObject = function (object, target, options) {
+	for (const [, value] of Object.entries(object)) {
+		if (JSON.stringify(value) === target) {
+			return true;
+		}
+
+		if (options.deep && typeof value === 'object') {
+			return traverseObject(value, target, options);
+		}
+	}
+
+	return false;
 };
 
 module.exports = (object, target, options) => {
@@ -22,6 +35,6 @@ module.exports = (object, target, options) => {
 		throw new TypeError(`Expected an object, got \`${object}\` (${typeof object})`);
 	}
 
-	options = {deep: false, exists: false, ...options};
-	return traverse(object, typeof target === 'object' ? JSON.stringify(target) : target, options);
+	options = {deep: false, ...options};
+	return typeof target === 'object' ? traverseObject(object, JSON.stringify(target), options) : traversePrimitive(object, target, options);
 };
